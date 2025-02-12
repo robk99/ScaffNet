@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ScaffNet": {
+      "commandName": "Project",
+      "commandLineArgs": "clean-a"
+    }
+  }
+}
