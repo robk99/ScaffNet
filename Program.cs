@@ -2,6 +2,14 @@
 
 internal class Program
 {
+    private static readonly string _solutionPath = @"C:/ScaffNet/";
+    private static readonly string _solutionName = "MyCleanArchitectureApp";
+    private static readonly string _sourceFolder = "src";
+    private static readonly string _app = "Application";
+    private static readonly string _infra = "Infrastructure";
+    private static readonly string _domain = "Domain";
+    private static readonly string _webApi = "Web.Api";
+
     private static void Main(string[] args)
     {
         if (args.Length == 0)
@@ -21,9 +29,6 @@ internal class Program
 
     }
 
-    private static string? _solutionPath { get; set; } = "";
-    private static string? _sourceFolder { get; set; } = "";
-
     public record RunCommandArgs()
     {
         public string Command { get; set; }
@@ -34,95 +39,95 @@ internal class Program
 
     static void CreateCleanArchitecture()
     {
-        string solutionName = "MyCleanArchitectureApp";
+        CreateSolutionAndProjects();
+        DeleteRedundantDefaultFiles();
+        AddDi();
 
-        // TODO: If you don't pick a folder, it will create the solution in the current directory
-        //string solutionPath = Path.Combine(Directory.GetCurrentDirectory(), solutionName);
-
-        _solutionPath = @"C:\ScaffNet";
-        _sourceFolder = "/src";
-
-        Console.WriteLine($"Creating Clean Architecture solution: {solutionName}");
-
-        // Create the solution
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new sln -n {solutionName} -o \"{_solutionPath}\"" });
-
-
-        // Create project directories
-        string[] projects = { "Domain", "Application", "Infrastructure", "Web.Api" };
-        foreach (string project in projects)
-        {
-            string projectPath = Path.Combine(_solutionPath, _sourceFolder, project);
-            Directory.CreateDirectory(projectPath);
-        }
-
-        // Create class library projects
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new classlib -n {solutionName}.Domain -o \"{_solutionPath}{_sourceFolder}/Domain\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new classlib -n {solutionName}.Application -o \"{_solutionPath}{_sourceFolder}/Application\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new classlib -n {solutionName}.Infrastructure -o \"{_solutionPath}{_sourceFolder}/Infrastructure\"" });
-
-        // Create Web Web.Api project
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new webapi -n {solutionName}.Web.Api -o \"{_solutionPath}{_sourceFolder}/Web.Api\"" });
-
-        // Add projects to solution
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"sln \"{_solutionPath}/{solutionName}.sln\" add \"{_solutionPath}{_sourceFolder}/Domain/{solutionName}.Domain.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"sln \"{_solutionPath}/{solutionName}.sln\" add \"{_solutionPath}{_sourceFolder}/Application/{solutionName}.Application.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"sln \"{_solutionPath}/{solutionName}.sln\" add \"{_solutionPath}{_sourceFolder}/Infrastructure/{solutionName}.Infrastructure.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"sln \"{_solutionPath}/{solutionName}.sln\" add \"{_solutionPath}{_sourceFolder}/Web.Api/{solutionName}.Web.Api.csproj\"" });
-
-        // Add project references
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{_solutionPath}{_sourceFolder}/Application/{solutionName}.Application.csproj\" reference \"{_solutionPath}{_sourceFolder}/Domain/{solutionName}.Domain.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{_solutionPath}{_sourceFolder}/Infrastructure/{solutionName}.Infrastructure.csproj\" reference \"{_solutionPath}{_sourceFolder}/Application/{solutionName}.Application.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{_solutionPath}{_sourceFolder}/Infrastructure/{solutionName}.Infrastructure.csproj\" reference \"{_solutionPath}{_sourceFolder}/Domain/{solutionName}.Domain.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{_solutionPath}{_sourceFolder}/Web.Api/{solutionName}.Web.Api.csproj\" reference \"{_solutionPath}{_sourceFolder}/Application/{solutionName}.Application.csproj\"" });
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{_solutionPath}{_sourceFolder}/Web.Api/{solutionName}.Web.Api.csproj\" reference \"{_solutionPath}{_sourceFolder}/Infrastructure/{solutionName}.Infrastructure.csproj\"" });
-
-
-        DeleteRedundantFiles();
-
-        //AddDI();
-
-
-        // Restore dependencies
-        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"restore \"{_solutionPath}/{solutionName}.sln\"" });
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"restore \"{_solutionPath}/{_solutionName}.sln\"" });
 
         Console.WriteLine("Clean Architecture solution successfully created!");
     }
 
-    static void DeleteRedundantFiles()
+    static void CreateSolutionAndProjects()
+    {
+        Console.WriteLine($"Creating Clean Architecture solution: {_solutionName}");
+
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new sln -n {_solutionName} -o \"{_solutionPath}\"" });
+
+        string[] classLibraryProjects = { _domain, _app, _infra };
+
+        foreach (string project in classLibraryProjects)
+        {
+            RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new classlib -n {_solutionName}.{project} -o \"{Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, project))}\"" });
+            RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"sln \"{_solutionPath}/{_solutionName}.sln\" add \"{Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, project, _solutionName))}.{project}.csproj\"" });
+        }
+
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new webapi -n {_solutionName}.{_webApi} -controllers -o \"{Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _webApi))}\"" });
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"sln \"{_solutionPath}/{_solutionName}.sln\" add \"{Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _webApi, _solutionName))}.{_webApi}.csproj\"" });
+
+        var applicationCsProjFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _app, _solutionName)) + $".{_app}.csproj";
+        var infrastructureCsProjFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _infra, _solutionName)) + $".{_infra}.csproj";
+        var domainCsProjFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _domain, _solutionName)) + $".{_domain}.csproj";
+        var webApiCsProjFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _webApi, _solutionName)) + $".{_webApi}.csproj";
+
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{applicationCsProjFilePath}\" reference \"{domainCsProjFilePath}\"" });
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{infrastructureCsProjFilePath}\" reference \"{applicationCsProjFilePath}\"" });
+        RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{webApiCsProjFilePath}\" reference \"{infrastructureCsProjFilePath}\"" });
+    }
+
+    static void DeleteRedundantDefaultFiles()
     {
         Console.WriteLine("\n--------- Deleting redundant files: ---------\n");
         DeleteAllFileInstances("Class1.cs");
     }
 
-    static void AddDI()
+    static void AddDi()
     {
-        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "templates/clean-architecture/", "DependencyInjection.tpl");
-        string[] projects = { "Application", "Infrastructure" };
+        var applicationCsProjFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _app, _solutionName)) + $".{_app}.csproj";
+        var infrastructureCsProjFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _infra, _solutionName)) + $".{_infra}.csproj";
+        var templatePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "templates/clean-architecture/", "DependencyInjection.tpl"));
+        string[] projectsForDi = { _app, _infra };
+        var namespaceReplaceText = "REPLACEME_NS";
+        var methodReplaceText = "REPLACEME_MT";
+        var diNugetPackage = "Microsoft.Extensions.DependencyInjection";
 
-        foreach (string project in projects)
+        foreach (string project in projectsForDi)
         {
-            string projectPath = Path.Combine(_solutionPath, _sourceFolder, project);
+            RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"add \"{applicationCsProjFilePath}\" package \"{diNugetPackage}\"" });
 
+            string content = File.ReadAllText(templatePath);
+            content = content
+                .Replace(namespaceReplaceText, $"{_solutionName}.{project}")
+                .Replace(methodReplaceText, project);
 
-            // TODO: Finish this. targetFilePath is not correct!
-            string targetFilePath = Path.Combine(_solutionPath, projectPath, "DependencyInjection.cs");
-
-            try
-            {
-                string content = File.ReadAllText(templatePath);
-                content = content.Replace("REPLACEME", $"MyCleanArchitectureApp.{project}");
-
-                File.WriteAllText(targetFilePath, content);
-                Console.WriteLine($"Created: {targetFilePath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing {project}: {ex.Message}");
-            }
-
-            // TODO: Add DI code to Web.Api's Program.cs
+            string targetFilePath = Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, project, "DependencyInjection.cs"));
+            File.WriteAllText(targetFilePath, content);
+            Console.WriteLine($"Created: {targetFilePath}");
         }
+
+        string programCsPath = $"{Path.GetFullPath(Path.Combine(_solutionPath, _sourceFolder, _webApi))}/Program.cs";
+
+        var lines = File.ReadAllLines(programCsPath).ToList();
+        for (int i = 0; i < lines.Count; i++)
+        {
+            if (i == 0)
+            {
+                lines.Insert(i, $"using {_solutionName}.{_app};");
+                lines.Insert(i + 1, $"using {_solutionName}.{_infra};");
+                lines.Insert(i + 2, "");
+            }
+
+            if (lines[i].Contains("builder.Services.AddControllers();"))
+            {
+                lines.Insert(i + 1, "builder.Services");
+                lines.Insert(i + 2, $"\t\t.Add{_app}()");
+                lines.Insert(i + 3, $"\t\t.Add{_infra}();");
+                lines.Insert(i + 4, "");
+                break;
+            }
+        }
+
+        File.WriteAllLines(programCsPath, lines);
     }
 
     static void DeleteAllFileInstances(string fileName)
