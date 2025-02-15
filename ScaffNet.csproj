@@ -8,9 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="templates\**\*.tpl">
+    <Content Include="Assets\**\*.tpl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\Logger\" />
+  </ItemGroup>
 
 </Project>
