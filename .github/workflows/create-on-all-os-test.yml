@@ -1,0 +1,33 @@
+name: Build and Test on All OSes
+
+on:
+  pull_request:
+    branches:
+      - test
+
+jobs:
+  build-and-test:
+    name: Build and Run Tests
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.0'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Start the app for testing
+        run: dotnet run arch-cli
+        continue-on-error:  true
