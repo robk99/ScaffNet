@@ -15,16 +15,14 @@ namespace ScaffNet.Utils
 
         /// <summary>
         /// Calls one of the Log methods based on the log level.
-        /// If no log level is provided, the minimal log level is used.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="logLevel"></param>
-        private void Log(string message, LogLevel? level = null)
+        private void Log(string message, LogLevel level)
         {
-            if (level == null) level = _minimalLevel;
             if (_minimalLevel == LogLevel.None || level < _minimalLevel) return;
 
-            switch (_minimalLevel)
+            switch (level)
             {
                 case LogLevel.Debug:
                     LogDebugBehaviour(message);

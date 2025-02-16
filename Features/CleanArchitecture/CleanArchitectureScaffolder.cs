@@ -3,7 +3,10 @@ using Logger = ScaffNet.Utils.ScaffLogger;
 
 namespace ScaffNet.Features.CleanArchitecture
 {
+    public class CleanArchitectureArgs : FileSystemArgs
+    {
 
+    }
     public static class CleanArchitectureScaffolder
     {
         private static readonly string _app = "Application";
@@ -21,9 +24,10 @@ namespace ScaffNet.Features.CleanArchitecture
                     new RunCommandArgs()
                     {
                         Command = "dotnet",
-                        Arguments = $"restore \"{args.SolutionPath}/{args.SolutionName}.sln\""
-                    },
-                    args.SolutionPath
+                        Arguments = $"restore \"{args.SolutionPath}/{args.SolutionName}.sln\"",
+                        SolutionPath = args.SolutionPath
+                    }
+
                 );
 
             Logger.Default.LogWarning("Clean Architecture solution successfully created!");
@@ -35,7 +39,11 @@ namespace ScaffNet.Features.CleanArchitecture
 
             Logger.Default.LogDebug($"Creating Clean Architecture solution: {args.SolutionName}");
 
-            Commander.RunCommand(new RunCommandArgs() { Command = "dotnet", Arguments = $"new sln -n {args.SolutionName} -o \"{args.SolutionPath}\"" }, args.SolutionPath);
+            Commander.RunCommand(new RunCommandArgs() { 
+                Command = "dotnet", 
+                Arguments = $"new sln -n {args.SolutionName} -o \"{args.SolutionPath}\"",
+                   SolutionPath = args.SolutionPath
+            });
 
             string[] classLibraryProjects = { _domain, _app, _infra };
 
@@ -45,32 +53,32 @@ namespace ScaffNet.Features.CleanArchitecture
                     new RunCommandArgs()
                     {
                         Command = "dotnet",
-                        Arguments = $"new classlib -n {args.SolutionName}.{project} -o \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, project))}\""
-                    },
-                    args.SolutionPath);
+                        Arguments = $"new classlib -n {args.SolutionName}.{project} -o \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, project))}\"",
+                        SolutionPath = args.SolutionPath
+                    });
                 Commander.RunCommand(
                     new RunCommandArgs()
                     {
                         Command = "dotnet",
-                        Arguments = $"sln \"{args.SolutionPath}/{args.SolutionName}.sln\" add \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, project, args.SolutionName))}.{project}.csproj\""
-                    },
-                    args.SolutionPath);
+                        Arguments = $"sln \"{args.SolutionPath}/{args.SolutionName}.sln\" add \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, project, args.SolutionName))}.{project}.csproj\"",
+                        SolutionPath = args.SolutionPath
+                    });
             }
 
             Commander.RunCommand(
                 new RunCommandArgs()
                 {
                     Command = "dotnet",
-                    Arguments = $"new webapi -n {args.SolutionName}.{_webApi} -controllers -o \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _webApi))}\""
-                },
-                args.SolutionPath);
+                    Arguments = $"new webapi -n {args.SolutionName}.{_webApi} -controllers -o \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _webApi))}\"",
+                 SolutionPath = args.SolutionPath
+                });
             Commander.RunCommand(
                 new RunCommandArgs()
                 {
                     Command = "dotnet",
-                    Arguments = $"sln \"{args.SolutionPath}/{args.SolutionName}.sln\" add \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _webApi, args.SolutionName))}.{_webApi}.csproj\""
-                },
-                args.SolutionPath);
+                    Arguments = $"sln \"{args.SolutionPath}/{args.SolutionName}.sln\" add \"{Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _webApi, args.SolutionName))}.{_webApi}.csproj\"",
+                     SolutionPath = args.SolutionPath
+                });
 
             var applicationCsProjFilePath = Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _app, args.SolutionName)) + $".{_app}.csproj";
             var infrastructureCsProjFilePath = Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _infra, args.SolutionName)) + $".{_infra}.csproj";
@@ -81,23 +89,23 @@ namespace ScaffNet.Features.CleanArchitecture
                 new RunCommandArgs()
                 {
                     Command = "dotnet",
-                    Arguments = $"add \"{applicationCsProjFilePath}\" reference \"{domainCsProjFilePath}\""
-                },
-                args.SolutionPath);
+                    Arguments = $"add \"{applicationCsProjFilePath}\" reference \"{domainCsProjFilePath}\"",
+                    SolutionPath = args.SolutionPath
+                });
             Commander.RunCommand(
                 new RunCommandArgs()
                 {
                     Command = "dotnet",
-                    Arguments = $"add \"{infrastructureCsProjFilePath}\" reference \"{applicationCsProjFilePath}\""
-                },
-                args.SolutionPath);
+                    Arguments = $"add \"{infrastructureCsProjFilePath}\" reference \"{applicationCsProjFilePath}\"",
+                     SolutionPath = args.SolutionPath
+                });
             Commander.RunCommand(
                 new RunCommandArgs()
                 {
                     Command = "dotnet",
-                    Arguments = $"add \"{webApiCsProjFilePath}\" reference \"{infrastructureCsProjFilePath}\""
-                },
-                args.SolutionPath);
+                    Arguments = $"add \"{webApiCsProjFilePath}\" reference \"{infrastructureCsProjFilePath}\"",
+                SolutionPath = args.SolutionPath
+                });
         }
 
         private static void AddDi(FileSystemArgs args)
@@ -113,10 +121,12 @@ namespace ScaffNet.Features.CleanArchitecture
             foreach (string project in projectsForDi)
             {
                 Commander.RunCommand(
-                    new RunCommandArgs() { 
-                        Command = "dotnet", 
-                        Arguments = $"add \"{applicationCsProjFilePath}\" package \"{diNugetPackage}\"" }
-                    , args.SolutionPath);
+                    new RunCommandArgs()
+                    {
+                        Command = "dotnet",
+                        Arguments = $"add \"{applicationCsProjFilePath}\" package \"{diNugetPackage}\"",
+                   SolutionPath = args.SolutionPath
+                    });
 
                 string content = File.ReadAllText(templatePath);
                 content = content

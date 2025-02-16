@@ -1,44 +1,46 @@
 ﻿using Microsoft.Extensions.Logging;
 using ScaffNet.Features.CleanArchitecture;
 using ScaffNet.Utils;
-
+using ScaffNet.Utils.ErrorHandling;
 internal class Program
 {
     private static void Main(string[] args)
     {
-        if (args.Length == 0)
+        try
         {
-            Console.WriteLine("No arguments provided");
-            return;
-        }
+            if (args.Length == 0)
+            {
+                Console.WriteLine("No arguments provided");
+                return;
+            }
 
-        if (args[0] == "clean-a")
-        {
-            //CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
-            //{
-            //    SolutionName = "MY_FUNKY_SOLUTION",
-            //    SolutionPath = "C:/ScaffNet/",
-            //    SourceFolder = "src"
-            //});
+            if (args[0] == "arch-cl")
+            {
+                //CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
+                //{
+                //    SolutionName = "MY_FUNKY_SOLUTION",
+                //    SolutionPath = "C:/ScaffNet/",
+                //    SourceFolder = "src"
+                //});
 
-            TestingCLI.Test();
+                TestingCLI.Test();
+            }
+            else
+            {
+                Console.WriteLine("Wrong argument.");
+            }
         }
-        else
+        catch (ScaffNetCommandException ex)
         {
-            Console.WriteLine("Wrong argument.");
+            // clients will handle this further
+        }
+        catch (Exception ex)
+        {
+            ScaffLogger.Default.LogError("Unhandled exception: " + ex.Message);
+            throw new Exception("Unhandled error happened!");
+            // clients will handle this further
         }
     }
-}
-
-
-public class TestLogger : CLILogger
-{
-    public TestLogger(ILogger<CLILogger> logger, LogLevel minimallevel) : base(logger, minimallevel)
-    {
-        
-    }
-
-    public void LogDebug(string message) => base.LogDebugBehaviour(message);
 }
 
 public class CLILogger : ScaffLogger
@@ -63,20 +65,24 @@ public class CLILogger : ScaffLogger
         _logger.LogError($"[ERROR] {message}");
 
     sealed protected override void LogCriticalBehaviour(string message) =>
-        _logger.LogCritical($"[ERROR] {message}");
+        _logger.LogCritical($"[CRITICAL] {message}");
 }
 
 public static class TestingCLI
 {
     public static void Test()
     {
+        var minimalLevel = LogLevel.Debug;
         using var loggerFactory = LoggerFactory.Create(builder =>
         {
+            builder
+            .SetMinimumLevel(minimalLevel)
+            .AddConsole();
         });
 
-        var myCliLogger = new CLILogger(loggerFactory.CreateLogger<CLILogger>(), LogLevel.Debug);
+        var myCliLogger = new CLILogger(loggerFactory.CreateLogger<CLILogger>(), minimalLevel);
 
-        Utilities.SetLogger(myCliLogger);
+        Utility.SetLogger(myCliLogger);
 
         CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
         {

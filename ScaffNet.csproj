@@ -15,10 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Utils\Logger\" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.2" />
   </ItemGroup>
 
 </Project>

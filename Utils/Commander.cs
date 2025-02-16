@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using ScaffNet.Utils.ErrorHandling;
+using System.Diagnostics;
+
 using Logger = ScaffNet.Utils.ScaffLogger;
 
 namespace ScaffNet.Utils
@@ -7,12 +9,12 @@ namespace ScaffNet.Utils
     {
         public string Command { get; set; }
         public string Arguments { get; set; }
-        public string? Message { get; set; }
+        public string SolutionPath { get; set; }
     }
 
     internal static class Commander
     {
-        internal static void RunCommand(RunCommandArgs args, string solutionPath)
+        internal static void RunCommand(RunCommandArgs args)
         {
             ProcessStartInfo psi = new ProcessStartInfo
             {
@@ -25,33 +27,29 @@ namespace ScaffNet.Utils
             };
 
             using Process process = new Process { StartInfo = psi };
+            string errorOutput = "";
 
             process.OutputDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Logger.Default.LogDebug(e.Data); };
-            process.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Logger.Default.LogError(e.Data); };
+            process.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) errorOutput += e.Data; };
 
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            process.WaitForExit();
-
-            // TODO: Build global exception handler and deleting inside it and here just throw an exception
-
-            if (process.ExitCode != 0)
+            try
             {
-                Logger.Default.LogWarning("\nRollbacking all the changes since there were errors!");
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                errorOutput += ex.Message;
+            }
+     
 
-                DirectoryInfo directoryInfo = new DirectoryInfo(solutionPath);
-
-                foreach (FileInfo file in directoryInfo.GetFiles())
-                {
-                    file.Delete();
-                }
-                foreach (DirectoryInfo dir in directoryInfo.GetDirectories())
-                {
-                    dir.Delete(true);
-                }
-
-                Environment.Exit(1);
+            if (process.ExitCode != 0 || !string.IsNullOrEmpty(errorOutput))
+            {
+                var fullCommand = $"{args.Command} {args.Arguments}";
+                Logger.Default.LogError(Errors.CommandError(fullCommand, errorOutput));
+                throw new ScaffNetCommandException(fullCommand, errorOutput);
             }
         }
     }
