@@ -20,14 +20,18 @@ internal class Program
                 var solutonName = args.Length > 1 ? args[1] : Constants.SOLUTION_NAME;
                 var solutionPath = args.Length > 2 ? args[2] : Constants.SOLUTION_PATH;
 
-                //CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
-                //{
-                //    SolutionName = solutonName,
-                //    SolutionPath = args.Length > 2 ? args[2] : Constants.SOLUTION_PATH,
-                //    SourceFolder = "src"
-                //});
+#if DEBUG
+                CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
+                {
+                    SolutionName = solutonName,
+                    SolutionPath = solutionPath,
+                    SourceFolder = "src"
+                });
 
+#else
                 TestingCLI.Test(solutonName, solutionPath);
+#endif
+
             }
             else
             {
