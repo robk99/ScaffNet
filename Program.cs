@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using ScaffNet.Data;
 using ScaffNet.Features.CleanArchitecture;
 using ScaffNet.Utils;
 using ScaffNet.Utils.ErrorHandling;
