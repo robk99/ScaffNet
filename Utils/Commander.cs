@@ -29,8 +29,21 @@ namespace ScaffNet.Utils
             using Process process = new Process { StartInfo = psi };
             string errorOutput = "";
 
-            process.OutputDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) Logger.Default.LogDebug(e.Data); };
-            process.ErrorDataReceived += (sender, e) => { if (!string.IsNullOrEmpty(e.Data)) errorOutput += e.Data; };
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    // catching dotnet build errors
+                    if (e.Data.Contains("error CS", StringComparison.OrdinalIgnoreCase))
+                        errorOutput += e.Data;
+                    else Logger.Default.LogDebug(e.Data);
+                }
+            };
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    errorOutput += e.Data;
+            };
 
             try
             {
@@ -43,7 +56,7 @@ namespace ScaffNet.Utils
             {
                 errorOutput += ex.Message;
             }
-     
+
 
             if (process.ExitCode != 0 || !string.IsNullOrEmpty(errorOutput))
             {

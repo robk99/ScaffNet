@@ -16,14 +16,14 @@ internal class Program
 
             if (args[0] == "arch-cl")
             {
-                //CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
-                //{
-                //    SolutionName = "MY_FUNKY_SOLUTION",
-                //    SolutionPath = "C:/ScaffNet/",
-                //    SourceFolder = "src"
-                //});
+                CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
+                {
+                    SolutionName = args[1],
+                    SolutionPath = args[2],
+                    SourceFolder = "src"
+                });
 
-                TestingCLI.Test();
+                TestingCLI.Test(args[1], args[2]);
             }
             else
             {
@@ -33,6 +33,7 @@ internal class Program
         catch (ScaffNetCommandException ex)
         {
             // clients will handle this further
+            Console.WriteLine();
         }
         catch (Exception ex)
         {
@@ -70,9 +71,9 @@ public class CLILogger : ScaffLogger
 
 public static class TestingCLI
 {
-    public static void Test()
+    public static void Test(string solutionName, string solutionPath)
     {
-        var minimalLevel = LogLevel.Debug;
+        var minimalLevel = LogLevel.Information;
         using var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder
@@ -86,8 +87,10 @@ public static class TestingCLI
 
         CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
         {
-            SolutionName = "MY_FUNKY_SOLUTION22",
-            SolutionPath = "C:/ScaffNet/",
+            //SolutionName = "MY_FUNKY_SOLUTION22",
+            //SolutionPath = "C:/ScaffNet/",
+            SolutionName = solutionName,
+            SolutionPath = solutionPath,
             SourceFolder = "src"
         });
     }

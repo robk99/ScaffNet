@@ -2,7 +2,7 @@
   "profiles": {
     "ScaffNet": {
       "commandName": "Project",
-      "commandLineArgs": "arch-cl"
+      "commandLineArgs": "arch-cl\r\nCA_Template\r\nC:/CA_Template/\r\n"
     }
   }
 }

@@ -30,14 +30,16 @@ namespace ScaffNet.Features.CleanArchitecture
 
                 );
 
-            Logger.Default.LogWarning("Clean Architecture solution successfully created!");
+            SolutionHelper.BuildSolution(args);
+
+            Logger.Default.LogWarning("Clean Architecture solution DONE!");
         }
 
 
         private static void CreateSolutionAndProjects(FileSystemArgs args)
         {
 
-            Logger.Default.LogDebug($"Creating Clean Architecture solution: {args.SolutionName}");
+            Logger.Default.LogInfo($"Creating Clean Architecture solution: {args.SolutionName}");
 
             Commander.RunCommand(new RunCommandArgs() { 
                 Command = "dotnet", 
@@ -106,6 +108,8 @@ namespace ScaffNet.Features.CleanArchitecture
                     Arguments = $"add \"{webApiCsProjFilePath}\" reference \"{infrastructureCsProjFilePath}\"",
                 SolutionPath = args.SolutionPath
                 });
+
+            Logger.Default.LogInfo($"Solution: {args.SolutionName} ; CREATED");
         }
 
         private static void AddDi(FileSystemArgs args)
@@ -161,6 +165,7 @@ namespace ScaffNet.Features.CleanArchitecture
             }
 
             File.WriteAllLines(programCsPath, lines);
+            Logger.Default.LogInfo($"Dependency injection created for projects: {string.Join(",", projectsForDi)}");
         }
     }
 }
