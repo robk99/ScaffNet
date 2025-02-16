@@ -9,7 +9,7 @@ namespace ScaffNet.Utils
     {
         public string Command { get; set; }
         public string Arguments { get; set; }
-        public string SolutionPath { get; set; }
+        public string? SolutionPath { get; set; }
     }
 
     internal static class Commander

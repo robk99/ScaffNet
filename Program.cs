@@ -2,6 +2,7 @@
 using ScaffNet.Features.CleanArchitecture;
 using ScaffNet.Utils;
 using ScaffNet.Utils.ErrorHandling;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -16,14 +17,17 @@ internal class Program
 
             if (args[0] == "arch-cl")
             {
-                CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
-                {
-                    SolutionName = args[1],
-                    SolutionPath = args[2],
-                    SourceFolder = "src"
-                });
+                var solutonName = args.Length > 1 ? args[1] : Constants.SOLUTION_NAME;
+                var solutionPath = args.Length > 2 ? args[2] : Constants.SOLUTION_PATH;
 
-                TestingCLI.Test(args[1], args[2]);
+                //CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
+                //{
+                //    SolutionName = solutonName,
+                //    SolutionPath = args.Length > 2 ? args[2] : Constants.SOLUTION_PATH,
+                //    SourceFolder = "src"
+                //});
+
+                TestingCLI.Test(solutonName, solutionPath);
             }
             else
             {
@@ -87,8 +91,6 @@ public static class TestingCLI
 
         CleanArchitectureScaffolder.Create(new CleanArchitectureArgs
         {
-            //SolutionName = "MY_FUNKY_SOLUTION22",
-            //SolutionPath = "C:/ScaffNet/",
             SolutionName = solutionName,
             SolutionPath = solutionPath,
             SourceFolder = "src"

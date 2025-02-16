@@ -25,7 +25,6 @@ namespace ScaffNet.Features.CleanArchitecture
                     {
                         Command = "dotnet",
                         Arguments = $"restore \"{args.SolutionPath}/{args.SolutionName}.sln\"",
-                        SolutionPath = args.SolutionPath
                     }
 
                 );
