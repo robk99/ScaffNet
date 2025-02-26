@@ -115,7 +115,8 @@ namespace ScaffNet.Features.CleanArchitecture
         {
             var applicationCsProjFilePath = Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _app, args.SolutionName)) + $".{_app}.csproj";
             var infrastructureCsProjFilePath = Path.GetFullPath(Path.Combine(args.SolutionPath, args.SourceFolder, _infra, args.SolutionName)) + $".{_infra}.csproj";
-            var templatePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "ScaffNetAssets/CleanArchitecture/", "DependencyInjection.tpl"));
+            string basePath = AppContext.BaseDirectory;
+            string templatePath = Path.Combine(basePath, "ScaffNetAssets", "CleanArchitecture", "DependencyInjection.tpl");
             string[] projectsForDi = { _app, _infra };
             var namespaceReplaceText = "REPLACEME_NS";
             var methodReplaceText = "REPLACEME_MT";
