@@ -1,5 +1,5 @@
-﻿using ScaffNet.Dtos;
-using Logger = ScaffNet.Utils.ScaffLogger;
+﻿using ScaffNet.Utils.Messages;
+using EventHandler = ScaffNet.Utils.EventHandling.ScaffEventHandler;
 
 namespace ScaffNet.Utils
 {
@@ -11,7 +11,7 @@ namespace ScaffNet.Utils
         /// <param name="solutionPath"></param>
         public static void DeleteAllCreatedFilesAndFolders(string solutionPath)
         {
-            Logger.Default.LogInfo("\nDeleting all the files and folders!");
+            EventHandler.Default.OnInfo("\nDeleting all the files and folders!");
 
             DirectoryInfo directoryInfo = new DirectoryInfo(solutionPath);
 
@@ -29,7 +29,7 @@ namespace ScaffNet.Utils
         {
             if (!Directory.Exists(solutionpath))
             {
-                Logger.Default.LogWarning($"Path not found: {solutionpath}");
+                EventHandler.Default.OnInfo(FileMessages.BaseDeleteAllInstanceMessage(fileName) + $" Path not found: {solutionpath}");
                 return;
             }
 
@@ -37,16 +37,16 @@ namespace ScaffNet.Utils
 
             foreach (var file in files)
             {
-                Logger.Default.LogDebug($"Deleting: {file}");
+                EventHandler.Default.OnDebug($"Deleting: {file}");
                 File.Delete(file);
             }
 
-            Logger.Default.LogDebug("Deletion complete.");
+            EventHandler.Default.OnInfo(FileMessages.BaseDeleteAllInstanceMessage(fileName) + " Deletion complete.");
         }
 
         internal static void DeleteRedundantDefaultFiles(string solutionPath, string[] files)
         {
-            Logger.Default.LogDebug("\n--------- Deleting redundant default files: ---------\n");
+            EventHandler.Default.OnDebug("\n--------- Deleting redundant default files: ---------\n");
 
             foreach (var fileName in files)
             {

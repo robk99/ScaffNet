@@ -1,4 +1,6 @@
-﻿namespace ScaffNet.Utils.ErrorHandling
+﻿using ScaffNet.Utils.MessageHandling;
+
+namespace ScaffNet.Utils.ExceptionHandling
 {
     public class ScaffNetException : Exception
     {
@@ -8,6 +10,6 @@
     public class ScaffNetCommandException : ScaffNetException
     {
         public ScaffNetCommandException(string command, string error)
-            : base(Errors.CommandError(command, error)) { }
+            : base(ErrorMessages.CommandError(command, error)) { }
     }
 }

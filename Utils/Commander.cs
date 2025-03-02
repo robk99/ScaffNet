@@ -1,7 +1,8 @@
-﻿using ScaffNet.Utils.ErrorHandling;
+﻿using ScaffNet.Utils.ExceptionHandling;
+using ScaffNet.Utils.MessageHandling;
 using System.Diagnostics;
 
-using Logger = ScaffNet.Utils.ScaffLogger;
+using EventHandler = ScaffNet.Utils.EventHandling.ScaffEventHandler;
 
 namespace ScaffNet.Utils
 {
@@ -36,7 +37,7 @@ namespace ScaffNet.Utils
                     // catching dotnet build errors
                     if (e.Data.Contains("error CS", StringComparison.OrdinalIgnoreCase))
                         errorOutput += e.Data;
-                    else Logger.Default.LogDebug(e.Data);
+                    else EventHandler.Default.OnDebug(e.Data);
                 }
             };
             process.ErrorDataReceived += (sender, e) =>
@@ -61,7 +62,7 @@ namespace ScaffNet.Utils
             if (process.ExitCode != 0 || !string.IsNullOrEmpty(errorOutput))
             {
                 var fullCommand = $"{args.Command} {args.Arguments}";
-                Logger.Default.LogError(Errors.CommandError(fullCommand, errorOutput));
+                EventHandler.Default.OnError(ErrorMessages.CommandError(fullCommand, errorOutput));
                 throw new ScaffNetCommandException(fullCommand, errorOutput);
             }
         }

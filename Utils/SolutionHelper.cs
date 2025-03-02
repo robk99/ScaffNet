@@ -1,5 +1,5 @@
 ﻿using ScaffNet.Features;
-using Logger = ScaffNet.Utils.ScaffLogger;
+using EventHandler = ScaffNet.Utils.EventHandling.ScaffEventHandler;
 
 namespace ScaffNet.Utils
 {
@@ -15,7 +15,7 @@ namespace ScaffNet.Utils
                     SolutionPath = args.SolutionPath
                 });
 
-            Logger.Default.LogInfo("Solution BUILT!");
+            EventHandler.Default.OnInfo("Solution BUILT!");
         }
     }
 }
