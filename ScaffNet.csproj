@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
+    <PackageId>ScaffNet</PackageId>
+    <Authors>Robert Kamenski</Authors>
+    <RepositoryUrl>https://github.com/robk99/ScaffNet</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>1.0.1</Version>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
