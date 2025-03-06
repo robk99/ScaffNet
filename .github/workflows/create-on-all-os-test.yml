@@ -30,5 +30,5 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Start the app for testing
-        run: dotnet run --configuration Release arch-cl
+        run: dotnet test
         continue-on-error:  true
