@@ -1,4 +1,6 @@
 # ScaffNet
+[![NuGet](https://img.shields.io/nuget/v/ScaffNet.svg)](https://www.nuget.org/packages/ScaffNet)
+[![License](https://img.shields.io/github/license/robk99/ScaffNet)](LICENSE)
 
 A lightweight, efficient .NET project scaffolder that generates industry-standard project templates with minimal overhead. ScaffNet is designed to streamline the initial setup process for .NET projects, allowing developers to focus on building features rather than configuring project structures.
 
