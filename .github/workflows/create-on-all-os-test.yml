@@ -29,6 +29,6 @@ jobs:
       - name: Build Solution
         run: dotnet build --configuration Release --no-restore
 
-      - name: Start the app for testing
+      - name: Start the tests
         run: dotnet test
-        continue-on-error:  true
+        timeout-minutes: 5
